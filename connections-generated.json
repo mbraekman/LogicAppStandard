@@ -1,0 +1,17 @@
+{
+  "serviceProviderConnections": null,
+  "managedApiConnections": {
+    "mbr-we-bicep-logicapps-service-con-log-analytics": {
+      "connection": {
+        "id": "/subscriptions/73640bb3-a5e3-4030-b99f-a7ac08caefbe/resourcegroups/maxim-sandbox-bicep/providers/microsoft.web/connections/mbr-we-bicep-logicapps-service-con-log-analytics"
+      },
+      "api": {
+        "id": "/subscriptions/73640bb3-a5e3-4030-b99f-a7ac08caefbe/providers/Microsoft.Web/locations/westeurope/managedApis/azureloganalyticsdatacollector"
+      },
+      "authentication": {
+        "type": "ManagedServiceIdentity"
+      },
+      "connectionRuntimeUrl": "https://78d4aa3e314ea86b.08.common.logic-westeurope.azure-apihub.net/apim/azureloganalyticsdatacollector/b2706b907aed47d19e938e24db330426"
+    }
+  }
+}

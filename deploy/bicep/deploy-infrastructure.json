@@ -1,0 +1,268 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.4.613.9944",
+      "templateHash": "1156889299694004252"
+    }
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "allowedValues": [
+        "westeurope",
+        "northeurope"
+      ]
+    },
+    "resourcePrefix": {
+      "type": "string"
+    }
+  },
+  "functions": [],
+  "variables": {
+    "trimmedResourcePrefix": "[replace(replace(parameters('resourcePrefix'), '-', ''), '_', '')]",
+    "appPlanName": "[format('{0}-plan', parameters('resourcePrefix'))]",
+    "logicAppAppServiceName": "[format('{0}-logicapps-service', parameters('resourcePrefix'))]",
+    "workflowName": "orc-event-logging",
+    "appInsightsName": "[format('{0}-platform-insights', parameters('resourcePrefix'))]",
+    "storageAccountName": "[format('{0}storage', variables('trimmedResourcePrefix'))]",
+    "keyVaultName": "[format('{0}-key-vault', parameters('resourcePrefix'))]",
+    "serviceBusName": "[format('{0}-service-bus', parameters('resourcePrefix'))]",
+    "logAnalyticsWorkspaceName": "[format('{0}-monitoring', parameters('resourcePrefix'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Insights/components",
+      "apiVersion": "2020-02-02-preview",
+      "name": "[variables('appInsightsName')]",
+      "location": "[parameters('location')]",
+      "kind": "web",
+      "properties": {
+        "Application_Type": "web"
+      }
+    },
+    {
+      "type": "Microsoft.OperationalInsights/workspaces",
+      "apiVersion": "2021-06-01",
+      "name": "[variables('logAnalyticsWorkspaceName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "sku": {
+          "name": "PerGB2018"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2021-02-01",
+      "name": "[variables('storageAccountName')]",
+      "location": "[parameters('location')]",
+      "kind": "StorageV2",
+      "sku": {
+        "name": "Standard_LRS"
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/blobServices",
+      "apiVersion": "2021-02-01",
+      "name": "[format('{0}/{1}', variables('storageAccountName'), 'default')]",
+      "properties": {
+        "restorePolicy": {
+          "enabled": false
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+      "apiVersion": "2021-02-01",
+      "name": "[format('{0}/{1}/{2}', variables('storageAccountName'), 'default', 'deploy')]",
+      "properties": {
+        "publicAccess": "Blob"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('storageAccountName'), 'default')]",
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults",
+      "apiVersion": "2019-09-01",
+      "name": "[variables('keyVaultName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "tenantId": "[subscription().tenantId]",
+        "sku": {
+          "family": "A",
+          "name": "standard"
+        },
+        "accessPolicies": []
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "apiVersion": "2019-09-01",
+      "name": "[format('{0}/{1}', variables('keyVaultName'), 'dummySecret')]",
+      "properties": {
+        "attributes": {
+          "enabled": true
+        },
+        "contentType": "text/plain",
+        "value": "abc"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.ServiceBus/namespaces",
+      "apiVersion": "2021-01-01-preview",
+      "name": "[variables('serviceBusName')]",
+      "location": "[parameters('location')]",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "zoneRedundant": false
+      }
+    },
+    {
+      "type": "Microsoft.ServiceBus/namespaces/queues",
+      "apiVersion": "2021-01-01-preview",
+      "name": "[format('{0}/{1}', variables('serviceBusName'), 'firstQueue')]",
+      "properties": {
+        "deadLetteringOnMessageExpiration": true
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.ServiceBus/namespaces', variables('serviceBusName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2020-12-01",
+      "name": "[variables('appPlanName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "B1"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2020-12-01",
+      "name": "[variables('logicAppAppServiceName')]",
+      "location": "[parameters('location')]",
+      "kind": "workflowapp,functionapp",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appPlanName'))]",
+        "httpsOnly": true,
+        "enabled": true,
+        "siteConfig": {
+          "appSettings": [
+            {
+              "name": "APP_KIND",
+              "value": "workflowApp"
+            },
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName'))).InstrumentationKey]"
+            },
+            {
+              "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+              "value": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName'))).ConnectionString]"
+            },
+            {
+              "name": "AzureFunctionsJobHost__extensionBundle__id",
+              "value": "Microsoft.Azure.Functions.ExtensionBundle.Workflows"
+            },
+            {
+              "name": "AzureFunctionsJobHost__extensionBundle__version",
+              "value": "[1.*, 2.0.0)"
+            },
+            {
+              "name": "AzureWebJobsStorage",
+              "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1}', variables('storageAccountName'), listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2021-02-01').keys[1].value)]"
+            },
+            {
+              "name": "FUNCTIONS_EXTENSION_VERSION",
+              "value": "~3"
+            },
+            {
+              "name": "FUNCTIONS_V2_COMPATIBILITY_MODE",
+              "value": "true"
+            },
+            {
+              "name": "FUNCTIONS_WORKER_RUNTIME",
+              "value": "node"
+            },
+            {
+              "name": "WEBSITE_NODE_DEFAULT_VERSION",
+              "value": "~12"
+            },
+            {
+              "name": "[format('Workflows.{0}.FlowState', variables('workflowName'))]",
+              "value": "Enabled"
+            },
+            {
+              "name": "[format('Workflows.{0}.OperationOptions', variables('workflowName'))]",
+              "value": "WithStatelessRunHistory"
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Insights/components', variables('appInsightsName'))]",
+        "[resourceId('Microsoft.Web/serverfarms', variables('appPlanName'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/accessPolicies",
+      "apiVersion": "2021-04-01-preview",
+      "name": "[format('{0}/{1}', variables('keyVaultName'), 'add')]",
+      "properties": {
+        "accessPolicies": [
+          {
+            "objectId": "[reference(resourceId('Microsoft.Web/sites', variables('logicAppAppServiceName')), '2020-12-01', 'full').identity.principalId]",
+            "tenantId": "[subscription().tenantId]",
+            "permissions": {
+              "secrets": [
+                "get",
+                "list"
+              ]
+            }
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('logicAppAppServiceName'))]",
+        "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Web/connections",
+      "apiVersion": "2016-06-01",
+      "name": "[format('{0}-con-log-analytics', variables('logicAppAppServiceName'))]",
+      "location": "[parameters('location')]",
+      "kind": "V2",
+      "properties": {
+        "api": {
+          "id": "[format('{0}/providers/Microsoft.Web/locations/{1}/managedApis/azureloganalyticsdatacollector', subscription().id, parameters('location'))]"
+        },
+        "parameterValues": {
+          "username": "[reference(resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))).customerId]",
+          "password": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName')), '2021-06-01').primarySharedKey]"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]"
+      ]
+    }
+  ]
+}
