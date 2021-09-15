@@ -13,9 +13,15 @@ jobs:
       runOnce:
         deploy:
           steps:
-            - pwsh: Get-ChildItem -Recurse "$(System.DefaultWorkingDirectory)" | Where { ! $_.PSIsContainer } | Select Name,FullName
-              displayName: 'Get files'
+            - task: PowerShell@2
+              inputs:
+                targetType: 'inline'
+                script: |
+                  Write-Host "Start"
+                  Get-ChildItem -Recurse "$(System.DefaultWorkingDirectory)" | Where { ! $_.PSIsContainer } | Select Name,FullName
+                  Write-Host "Completed"
               enabled: true
+          
             ### Tokenize ###
             - task: qetza.replacetokens.replacetokens-task.replacetokens@3
               displayName: 'Replace template parameters'
