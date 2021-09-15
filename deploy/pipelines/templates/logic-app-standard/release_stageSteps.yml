@@ -19,9 +19,9 @@ jobs:
               inputs:
                 rootDirectory: '$(System.DefaultWorkingDirectory)'
                 targetFiles: |
-                  deploy/bicep/**.json
-                  deploy/**.json
-                  deploy/bicep/deploy-infrastructure.parameters.json
+                  /deploy/bicep/**.json
+                  /deploy/**.json
+                  /deploy/bicep/deploy-infrastructure.parameters.json
                   deploy-infrastructure.parameters.json
                 verbosity: detailed
                 actionOnMissing: 'fail'
