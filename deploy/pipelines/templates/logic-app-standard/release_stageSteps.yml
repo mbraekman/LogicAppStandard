@@ -21,6 +21,14 @@ jobs:
                   Get-ChildItem -Recurse "$(System.DefaultWorkingDirectory)" | Where { ! $_.PSIsContainer } | Select Name,FullName
                   Write-Host "Completed"
               enabled: true
+            - task: PowerShell@2
+              inputs:
+                targetType: 'inline'
+                script: |
+                  Write-Host "Start"
+                  Get-ChildItem -Recurse "$(PIPELINE.WORKSPACE)" | Where { ! $_.PSIsContainer } | Select Name,FullName
+                  Write-Host "Completed"
+              enabled: true
           
             ### Tokenize ###
             - task: qetza.replacetokens.replacetokens-task.replacetokens@3
