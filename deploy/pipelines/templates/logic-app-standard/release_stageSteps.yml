@@ -2,11 +2,13 @@ parameters:
   azureServiceConnection: ''
   location: ''
   environment: ''
+  environmentShortName: ''
   resourceGroupName: ''
 
 jobs:
   - job: infrastructure_deploy
     displayName: Deploy Infrastructure
+    environment: ${{ parameters.environment }}
     steps:
     ### Tokenize ###
     - task: qetza.replacetokens.replacetokens-task.replacetokens@3
@@ -37,6 +39,7 @@ jobs:
     ### Prep the package to deploy the actual workflows ###
   - job: build_app_package
     displayName: Build app package
+    environment: ${{ parameters.environment }}
     dependsOn: infrastructure_deploy
     steps:
     ### Tokenize ###
@@ -80,19 +83,20 @@ jobs:
         rootFolderOrFile: '$(System.DefaultWorkingDirectory)/project_output'
         includeRootFolder: false
         archiveType: 'zip'
-        archiveFile: '$(Build.ArtifactStagingDirectory)/logic-app-standard-${{ parameters.environment }}.zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/logic-app-standard-${{ parameters.environmentShortName }}.zip'
         replaceExistingArchive: true
 
     - task: PublishPipelineArtifact@1
       displayName: 'Publish zip package'
       inputs:
-        targetPath: '$(Build.ArtifactStagingDirectory)/logic-app-standard-${{ parameters.environment }}.zip'
+        targetPath: '$(Build.ArtifactStagingDirectory)/logic-app-standard-${{ parameters.environmentShortName }}.zip'
         artifact: logic-app-standard
         publishLocation: 'pipeline' 
 
   ## Deploy the workflows
   - job: deploy_app
     displayName: Deploy application
+    environment: ${{ parameters.environment }}
     dependsOn: build_app_package
     steps:  
     - task: DownloadPipelineArtifact@2
@@ -108,5 +112,5 @@ jobs:
         azureSubscription: '${{ parameters.azureServiceConnection }}'
         appType: 'functionApp'
         appName: '$(Azure.Resource.LogicAppStandard.Service)'
-        package: '$(Build.ArtifactStagingDirectory)/logic-app-standard-${{ parameters.environment }}.zip'
+        package: '$(Build.ArtifactStagingDirectory)/logic-app-standard-${{ parameters.environmentShortName }}.zip'
         deploymentMethod: 'zipDeploy' 

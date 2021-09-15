@@ -14,21 +14,13 @@ stages:
     - template: ../lib/environment/sandbox.yml
     - template: ../lib/general/azure.yml
   jobs: 
-  - deployment: Sandbox
-    displayName: Sandbox
-    pool:
-      vmImage: "windows-latest"
-    environment: Sandbox
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-            - template: templates/logic-app-standard/release_stageSteps.yml
-              parameters:
-                azureServiceConnection: 'Visual Studio Enterprise-abonnement – MPN'
-                location: '$(Environment.Region.Primary)'
-                environment: '$(Environment.ShortName)'
-                resourceGroupName: '$(ResourceGroup.LogicAppStandard)'
+  - template: templates/logic-app-standard/release_stageSteps.yml
+    parameters:
+      azureServiceConnection: 'Visual Studio Enterprise-abonnement – MPN'
+      location: '$(Environment.Region.Primary)'
+      environment: 'DEV'
+      environmentShortName: '$(Environment.ShortName)'
+      resourceGroupName: '$(ResourceGroup.LogicAppStandard)'
       
 - stage: DEV
   displayName: DEV
@@ -38,18 +30,10 @@ stages:
     - template: ../lib/environment/dev.yml
     - template: ../lib/general/azure.yml
   jobs: 
-  - deployment: DEV
-    displayName: DEV
-    pool:
-      vmImage: "windows-latest"
-    environment: DEV
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-            - template: templates/logic-app-standard/release_stageSteps.yml
-              parameters:
-                azureServiceConnection: 'Visual Studio Enterprise-abonnement – MPN'
-                location: '$(Environment.Region.Primary)'
-                environment: '$(Environment.ShortName)'
-                resourceGroupName: '$(ResourceGroup.LogicAppStandard)'
+  - template: templates/logic-app-standard/release_stageSteps.yml
+    parameters:
+      azureServiceConnection: 'Visual Studio Enterprise-abonnement – MPN'
+      location: '$(Environment.Region.Primary)'
+      environment: 'DEV'
+      environmentShortName: '$(Environment.ShortName)'
+      resourceGroupName: '$(ResourceGroup.LogicAppStandard)'
