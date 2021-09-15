@@ -6,11 +6,13 @@
 ])
 param location string
 param resourcePrefix string
+param logicAppServiceName string
 
 // Define variables
 var trimmedResourcePrefix = replace(replace(resourcePrefix, '-', ''), '_', '')
 var appPlanName = '${resourcePrefix}-plan'
-var logicAppAppServiceName = '${resourcePrefix}-logicapps-service'
+//var logicAppAppServiceName = '${resourcePrefix}-logicapps-service'
+//var logicAppAppServiceName = logicApp_Service_Name
 var workflowName = 'orc-event-handler-stateless'
 var appInsightsName = '${resourcePrefix}-platform-insights'
 var storageAccountName = '${trimmedResourcePrefix}storage'
@@ -136,7 +138,7 @@ resource myAppPlan 'Microsoft.Web/serverfarms@2020-12-01' = {
 // Create Logic App Standard
 resource appService 'Microsoft.Web/sites@2020-12-01' = {
   location: location
-  name: logicAppAppServiceName
+  name: logicAppServiceName
   kind: 'workflowapp,functionapp'
   identity: {
     type: 'SystemAssigned'
@@ -222,7 +224,7 @@ resource accessToKeyVaultFromAppService 'Microsoft.KeyVault/vaults/accessPolicie
 
 // Create Blob Storage API Connection
 resource logAnalyticsConnection 'Microsoft.Web/connections@2016-06-01' = {
-  name: '${logicAppAppServiceName}-con-log-analytics'
+  name: '${logicAppServiceName}-con-log-analytics'
   location: location
   kind: 'V2'
   properties: {

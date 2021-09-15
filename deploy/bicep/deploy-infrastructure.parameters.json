@@ -7,6 +7,9 @@
         },
         "resourcePrefix":{
             "value": "#{Azure.Resource.Prefix}#"
+        },
+        "logicAppServiceName": {
+            "value": "#{Azure.Resource.LogicAppStandard.Service}#"
         }
     }
 }

@@ -9,9 +9,9 @@ jobs:
     steps:
     ### Tokenize ###
     - task: qetza.replacetokens.replacetokens-task.replacetokens@3
-      displayName: 'Replace ARM template parameters'
+      displayName: 'Replace template parameters'
       inputs:
-        rootDirectory: '$(System.DefaultWorkingDirectory)/deploy/bicep'
+        rootDirectory: '$(Artifacts.Location.Deploy.Bicep)'
         targetFiles: |
          deploy-infrastructure.parameters.json
         verbosity: detailed
@@ -38,6 +38,18 @@ jobs:
     displayName: Build app package
     dependsOn: infrastructure_deploy
     steps:
+    ### Tokenize ###
+    - task: qetza.replacetokens.replacetokens-task.replacetokens@3
+      displayName: 'Replace workflow placeholders for connections'
+      inputs:
+        rootDirectory: '$(Artifacts.Location.Source)'
+        targetFiles: |
+         orc-event-handler-statefull/workflow.json
+         orc-event-handler-stateless/workflow.json
+        verbosity: detailed
+        actionOnMissing: 'fail'
+      enabled: true
+
     - task: AzurePowerShell@4
       displayName: 'Generate connections.json file'
       inputs:

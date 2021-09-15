@@ -7,7 +7,7 @@
               "inputs": {
                   "host": {
                       "connection": {
-                          "referenceName": "azureloganalyticsdatacollector"
+                          "referenceName": "#{Azure.Resource.LogicAppStandard.Service}#-con-log-analytics"
                       }
                   },
                   "method": "post",
