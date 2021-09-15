@@ -8,7 +8,7 @@ parameters:
 jobs:
   - job: infrastructure_deploy
     displayName: Deploy Infrastructure
-    environment: '${{ parameters.environment }}'
+    environment: Sandbox
     steps:
     ### Tokenize ###
     - task: qetza.replacetokens.replacetokens-task.replacetokens@3
@@ -39,7 +39,7 @@ jobs:
     ### Prep the package to deploy the actual workflows ###
   - job: build_app_package
     displayName: Build app package
-    environment: '${{ parameters.environment }}'
+    environment: Sandbox
     dependsOn: infrastructure_deploy
     steps:
     ### Tokenize ###
@@ -96,7 +96,7 @@ jobs:
   ## Deploy the workflows
   - job: deploy_app
     displayName: Deploy application
-    environment: '${{ parameters.environment }}'
+    environment: Sandbox
     dependsOn: build_app_package
     steps:  
     - task: DownloadPipelineArtifact@2
