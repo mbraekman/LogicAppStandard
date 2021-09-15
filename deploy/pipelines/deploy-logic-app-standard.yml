@@ -10,6 +10,7 @@ variables:
 stages:
 - stage: Sandbox
   displayName: Sandbox
+  environment: Sandbox
   variables:
     - template: ../lib/environment/sandbox.yml
     - template: ../lib/general/azure.yml
@@ -23,6 +24,7 @@ stages:
       
 - stage: DEV
   displayName: DEV
+  environment: DEV
   dependsOn: [Sandbox]
   condition: and(ne(variables['Build.Reason'], 'PullRequest'), succeeded())
   variables:
