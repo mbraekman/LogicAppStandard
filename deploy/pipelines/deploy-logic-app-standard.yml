@@ -19,3 +19,17 @@ stages:
       azureServiceConnection: 'Visual Studio Enterprise-abonnement – MPN'
       resourceGroupName: '$(ResourceGroup.LogicAppStandard)'
       location: '$(Environment.Region.Primary)'
+      
+- stage: dev_deploy
+  displayName: DEV
+  dependsOn: [Sandbox]
+  condition: and(ne(variables['Build.Reason'], 'PullRequest'), succeeded())
+  variables:
+    - template: ../lib/environment/dev.yml
+    - template: ../lib/general/azure.yml
+  jobs: 
+  - template: templates/logic-app-standard/release_stageSteps.yml
+    parameters:
+      azureServiceConnection: 'Visual Studio Enterprise-abonnement – MPN'
+      resourceGroupName: '$(ResourceGroup.LogicAppStandard)'
+      location: '$(Environment.Region.Primary)'

@@ -1,0 +1,6 @@
+variables:
+  Environment.Name: 'DEV'
+  Environment.ShortName: 'dev'
+  
+  Environment.Region.Primary: "westeurope"
+  Environment.Region.Primary.ShortName: "we"
