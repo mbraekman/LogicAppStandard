@@ -13,15 +13,15 @@ jobs:
       runOnce:
         deploy:
           steps:
+            - pwsh: Get-ChildItem -Recurse "$(System.DefaultWorkingDirectory)" | Where { ! $_.PSIsContainer } | Select Name,FullName
+              displayName: 'Get files'
+              enabled: true
             ### Tokenize ###
             - task: qetza.replacetokens.replacetokens-task.replacetokens@3
               displayName: 'Replace template parameters'
               inputs:
-                rootDirectory: '$(System.ArtifactsDirectory)'
+                rootDirectory: '$(Artifacts.Location.Deploy.Bicep)'
                 targetFiles: |
-                  /deploy/bicep/**.json
-                  /deploy/**.json
-                  /deploy/bicep/deploy-infrastructure.parameters.json
                   deploy-infrastructure.parameters.json
                 verbosity: detailed
                 actionOnMissing: 'fail'
