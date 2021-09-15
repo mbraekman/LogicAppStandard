@@ -22,8 +22,8 @@ jobs:
                 rootDirectory: '$(Artifacts.Location.Deploy.Bicep)'
                 targetFiles: |
                   deploy-infrastructure.parameters.json
-              verbosity: detailed
-              actionOnMissing: 'fail'
+                verbosity: detailed
+                actionOnMissing: 'fail'
               enabled: true
 
             ### Deploy infrastructure using the bicep-file ###
