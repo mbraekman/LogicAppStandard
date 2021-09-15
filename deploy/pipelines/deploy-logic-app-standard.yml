@@ -3,9 +3,9 @@ name: 'Logic App Standard Release'
 trigger: none
      
 variables:
-  Artifacts.Location.Deploy.Bicep: deploy/bicep
-  Artifacts.Location.Deploy.Scripts: deploy/scripts
-  Artifacts.Location.Source: src
+  Artifacts.Location.Deploy.Bicep: $(Build.SourcesDirectory)/deploy/bicep
+  Artifacts.Location.Deploy.Scripts: $(Build.SourcesDirectory)/deploy/scripts
+  Artifacts.Location.Source: $(Build.SourcesDirectory)/src
 
 stages:
 - stage: Sandbox
