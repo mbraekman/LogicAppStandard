@@ -17,7 +17,7 @@ jobs:
             - task: qetza.replacetokens.replacetokens-task.replacetokens@3
               displayName: 'Replace template parameters'
               inputs:
-                rootDirectory: '$(System.DefaultWorkingDirectory)'
+                rootDirectory: '$(System.ArtifactsDirectory)'
                 targetFiles: |
                   /deploy/bicep/**.json
                   /deploy/**.json
