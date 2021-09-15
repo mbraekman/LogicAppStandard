@@ -18,7 +18,7 @@ jobs:
                 targetType: 'inline'
                 script: |
                   Write-Host "Start"
-                  Get-ChildItem -Recurse "$(System.DefaultWorkingDirectory)" | Where { ! $_.PSIsContainer } | Select Name,FullName
+                  Get-ChildItem -Recurse "." | Where { ! $_.PSIsContainer } | Select Name,FullName
                   Write-Host "Completed"
               enabled: true
             - task: PowerShell@2
@@ -26,7 +26,7 @@ jobs:
                 targetType: 'inline'
                 script: |
                   Write-Host "Start"
-                  Get-ChildItem -Recurse "$(PIPELINE.WORKSPACE)" | Where { ! $_.PSIsContainer } | Select Name,FullName
+                  Get-ChildItem -Recurse "/" | Where { ! $_.PSIsContainer } | Select Name,FullName
                   Write-Host "Completed"
               enabled: true
           
