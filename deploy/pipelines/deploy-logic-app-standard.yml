@@ -14,13 +14,20 @@ stages:
     - template: ../lib/environment/sandbox.yml
     - template: ../lib/general/azure.yml
   jobs: 
-  - template: templates/logic-app-standard/release_stageSteps.yml
+  - deployment: Sandbox
+    displayName: Sandbox
+    pool:
+      vmImage: "windows-latest"
     environment: Sandbox
-    parameters:
-      azureServiceConnection: 'Visual Studio Enterprise-abonnement – MPN'
-      location: '$(Environment.Region.Primary)'
-      environment: '$(Environment.ShortName)'
-      resourceGroupName: '$(ResourceGroup.LogicAppStandard)'
+    strategy:
+      runOnce:
+        deploy:
+          - template: templates/logic-app-standard/release_stageSteps.yml
+            parameters:
+              azureServiceConnection: 'Visual Studio Enterprise-abonnement – MPN'
+              location: '$(Environment.Region.Primary)'
+              environment: '$(Environment.ShortName)'
+              resourceGroupName: '$(ResourceGroup.LogicAppStandard)'
       
 - stage: DEV
   displayName: DEV
@@ -30,10 +37,17 @@ stages:
     - template: ../lib/environment/dev.yml
     - template: ../lib/general/azure.yml
   jobs: 
-  - template: templates/logic-app-standard/release_stageSteps.yml
+  - deployment: DEV
+    displayName: DEV
+    pool:
+      vmImage: "windows-latest"
     environment: DEV
-    parameters:
-      azureServiceConnection: 'Visual Studio Enterprise-abonnement – MPN'
-      location: '$(Environment.Region.Primary)'
-      environment: '$(Environment.ShortName)'
-      resourceGroupName: '$(ResourceGroup.LogicAppStandard)'
+    strategy:
+      runOnce:
+        deploy:
+          - template: templates/logic-app-standard/release_stageSteps.yml
+            parameters:
+              azureServiceConnection: 'Visual Studio Enterprise-abonnement – MPN'
+              location: '$(Environment.Region.Primary)'
+              environment: '$(Environment.ShortName)'
+              resourceGroupName: '$(ResourceGroup.LogicAppStandard)'
