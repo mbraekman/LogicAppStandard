@@ -1,7 +1,8 @@
 parameters:
   azureServiceConnection: ''
-  resourceGroupName: ''
   location: ''
+  environment: ''
+  resourceGroupName: ''
 
 jobs:
   - job: infrastructure_deploy
@@ -79,13 +80,13 @@ jobs:
         rootFolderOrFile: '$(System.DefaultWorkingDirectory)/project_output'
         includeRootFolder: false
         archiveType: 'zip'
-        archiveFile: '$(Build.ArtifactStagingDirectory)/logic-app-standard.zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/logic-app-standard-${{ parameters.environment }}.zip'
         replaceExistingArchive: true
 
     - task: PublishPipelineArtifact@1
       displayName: 'Publish zip package'
       inputs:
-        targetPath: '$(Build.ArtifactStagingDirectory)/logic-app-standard.zip'
+        targetPath: '$(Build.ArtifactStagingDirectory)/logic-app-standard-${{ parameters.environment }}.zip'
         artifact: logic-app-standard
         publishLocation: 'pipeline' 
 
@@ -107,5 +108,5 @@ jobs:
         azureSubscription: '${{ parameters.azureServiceConnection }}'
         appType: 'functionApp'
         appName: '$(Azure.Resource.LogicAppStandard.Service)'
-        package: '$(Build.ArtifactStagingDirectory)/logic-app-standard.zip'
+        package: '$(Build.ArtifactStagingDirectory)/logic-app-standard-${{ parameters.environment }}.zip'
         deploymentMethod: 'zipDeploy' 

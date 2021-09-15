@@ -8,7 +8,7 @@ variables:
   Artifacts.Location.Source: $(System.DefaultWorkingDirectory)/src
 
 stages:
-- stage: sandbox_deploy
+- stage: Sandbox
   displayName: Sandbox
   variables:
     - template: ../lib/environment/sandbox.yml
@@ -17,12 +17,13 @@ stages:
   - template: templates/logic-app-standard/release_stageSteps.yml
     parameters:
       azureServiceConnection: 'Visual Studio Enterprise-abonnement – MPN'
-      resourceGroupName: '$(ResourceGroup.LogicAppStandard)'
       location: '$(Environment.Region.Primary)'
+      environment: '$(Environment.ShortName)'
+      resourceGroupName: '$(ResourceGroup.LogicAppStandard)'
       
-- stage: dev_deploy
+- stage: DEV
   displayName: DEV
-  dependsOn: [sandbox_deploy]
+  dependsOn: [Sandbox]
   condition: and(ne(variables['Build.Reason'], 'PullRequest'), succeeded())
   variables:
     - template: ../lib/environment/dev.yml
@@ -31,5 +32,6 @@ stages:
   - template: templates/logic-app-standard/release_stageSteps.yml
     parameters:
       azureServiceConnection: 'Visual Studio Enterprise-abonnement – MPN'
-      resourceGroupName: '$(ResourceGroup.LogicAppStandard)'
       location: '$(Environment.Region.Primary)'
+      environment: '$(Environment.ShortName)'
+      resourceGroupName: '$(ResourceGroup.LogicAppStandard)'
