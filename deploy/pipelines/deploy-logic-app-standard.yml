@@ -22,7 +22,7 @@ stages:
       
 - stage: dev_deploy
   displayName: DEV
-  dependsOn: [Sandbox]
+  dependsOn: [sandbox_deploy]
   condition: and(ne(variables['Build.Reason'], 'PullRequest'), succeeded())
   variables:
     - template: ../lib/environment/dev.yml
