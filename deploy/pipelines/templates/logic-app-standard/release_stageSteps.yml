@@ -8,8 +8,6 @@ parameters:
 jobs:
   - deployment: infrastructure_deploy
     displayName: Deploy Infrastructure
-    pool:
-      vmImage: 'Ubuntu-latest'
     environment: '${{ parameters.environment }}'
     strategy:
       runOnce:
@@ -45,8 +43,6 @@ jobs:
   - deployment: build_app_package
     displayName: Build app package
     dependsOn: infrastructure_deploy
-    pool:
-      vmImage: 'Ubuntu-latest'
     environment: '${{ parameters.environment }}'
     strategy:
       runOnce:
@@ -107,8 +103,6 @@ jobs:
   - deployment: deploy_app
     displayName: Deploy application
     dependsOn: build_app_package
-    pool:
-      vmImage: 'Ubuntu-latest'
     environment: '${{ parameters.environment }}'
     strategy:
       runOnce:
