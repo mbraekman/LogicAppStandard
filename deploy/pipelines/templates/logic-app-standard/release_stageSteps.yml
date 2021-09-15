@@ -6,41 +6,40 @@ parameters:
   resourceGroupName: ''
 
 jobs:
-  - job: infrastructure_deploy
-    - deployment: DeployWeb
-      displayName: Deploy Infrastructure
-      pool:
-        vmImage: 'Ubuntu-latest'
-      environment: '${{ parameters.environment }}'
-      strategy:                 # deployment strategy
-        runOnce:                # default strategy
-          deploy:
-            steps:
-              ### Tokenize ###
-              - task: qetza.replacetokens.replacetokens-task.replacetokens@3
-                displayName: 'Replace template parameters'
-                inputs:
-                  rootDirectory: '$(Artifacts.Location.Deploy.Bicep)'
-                  targetFiles: |
-                    deploy-infrastructure.parameters.json
-                verbosity: detailed
-                actionOnMissing: 'fail'
-                enabled: true
+  - deployment: infrastructure_deploy
+    displayName: Deploy Infrastructure
+    pool:
+      vmImage: 'Ubuntu-latest'
+    environment: '${{ parameters.environment }}'
+    strategy:                 # deployment strategy
+      runOnce:                # default strategy
+        deploy:
+          steps:
+            ### Tokenize ###
+            - task: qetza.replacetokens.replacetokens-task.replacetokens@3
+              displayName: 'Replace template parameters'
+              inputs:
+                rootDirectory: '$(Artifacts.Location.Deploy.Bicep)'
+                targetFiles: |
+                  deploy-infrastructure.parameters.json
+              verbosity: detailed
+              actionOnMissing: 'fail'
+              enabled: true
 
-              ### Deploy infrastructure using the bicep-file ###
-              - task: AzureCLI@2
-                displayName: 'Deploy infra with Bicep'
-                inputs:
-                  azureSubscription: '${{ parameters.azureServiceConnection }}'
-                  scriptType: 'pscore'
-                  scriptLocation: 'inlineScript'
-                  inlineScript: |
-                    az group create --name ${{ parameters.resourceGroupName }} --location ${{ parameters.location }}
-                    az deployment group create  `
-                    --template-file $(Artifacts.Location.Deploy.Bicep)/deploy-infrastructure.bicep `
-                    --parameters $(Artifacts.Location.Deploy.Bicep)/deploy-infrastructure.parameters.json `
-                    --resource-group ${{ parameters.resourceGroupName }} `
-                    --debug
+            ### Deploy infrastructure using the bicep-file ###
+            - task: AzureCLI@2
+              displayName: 'Deploy infra with Bicep'
+              inputs:
+                azureSubscription: '${{ parameters.azureServiceConnection }}'
+                scriptType: 'pscore'
+                scriptLocation: 'inlineScript'
+                inlineScript: |
+                  az group create --name ${{ parameters.resourceGroupName }} --location ${{ parameters.location }}
+                  az deployment group create  `
+                  --template-file $(Artifacts.Location.Deploy.Bicep)/deploy-infrastructure.bicep `
+                  --parameters $(Artifacts.Location.Deploy.Bicep)/deploy-infrastructure.parameters.json `
+                  --resource-group ${{ parameters.resourceGroupName }} `
+                  --debug
 
     ### Prep the package to deploy the actual workflows ###
   - job: build_app_package
