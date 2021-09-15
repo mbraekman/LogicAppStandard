@@ -1,0 +1,99 @@
+parameters:
+  azureServiceConnection: ''
+  resourceGroupName: ''
+  location: ''
+
+jobs:
+  - job: infrastructure_deploy
+    displayName: Deploy Infrastructure
+    steps:
+    ### Tokenize ###
+    - task: qetza.replacetokens.replacetokens-task.replacetokens@3
+      displayName: 'Replace ARM template parameters'
+      inputs:
+        rootDirectory: '$(System.DefaultWorkingDirectory)/deploy/bicep'
+        targetFiles: |
+         deploy-infrastructure.parameters.json
+        verbosity: detailed
+        actionOnMissing: 'fail'
+      enabled: true
+
+    ### Deploy infrastructure using the bicep-file ###
+    - task: AzureCLI@2
+      displayName: 'Deploy infra with Bicep'
+      inputs:
+        azureSubscription: '${{ parameters.azureServiceConnection }}'
+        scriptType: 'pscore'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          az group create --name ${{ parameters.resourceGroupName }} --location ${{ parameters.location }}
+          az deployment group create  `
+          --template-file $(Artifacts.Location.Deploy.Bicep)/deploy-infrastructure.bicep `
+          --parameters $(Artifacts.Location.Deploy.Bicep)/deploy-infrastructure.parameters.json `
+          --resource-group ${{ parameters.resourceGroupName }} `
+          --debug
+
+    ### Prep the package to deploy the actual workflows ###
+  - job: build_app_package
+    displayName: Build app package
+    dependsOn: infrastructure_deploy
+    steps:
+    - task: AzurePowerShell@4
+      displayName: 'Generate connections.json file'
+      inputs:
+        azureSubscription: '${{ parameters.azureServiceConnection }}'
+        ScriptType: 'FilePath'
+        ScriptPath: '$(Artifacts.Location.Deploy.Scripts)/generate-connections.ps1'
+        ScriptArguments: '-resourceGroup ${{ parameters.resourceGroupName }} -inputConnectionsFilePath $(Artifacts.Location.Source)/connections.json -outputLocation $(Artifacts.Location.Source)/connections.json'
+        FailOnStandardError: true
+        azurePowerShellVersion: 'LatestVersion'
+        pwsh: true
+
+    - task: CopyFiles@2
+      displayName: 'Create project folder'
+      inputs:
+        SourceFolder: '$(Artifacts.Location.Source)'
+        Contents: |
+          host.json
+          proxies.json
+          connections.json
+          orc-event-handler-statefull/**
+          orc-event-handler-stateless/**
+        TargetFolder: 'project_output'
+
+    - task: ArchiveFiles@2
+      displayName: 'Create project zip'
+      inputs:
+        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/project_output'
+        includeRootFolder: false
+        archiveType: 'zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/logic-app-standard.zip'
+        replaceExistingArchive: true
+
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish zip package'
+      inputs:
+        targetPath: '$(Build.ArtifactStagingDirectory)/logic-app-standard.zip'
+        artifact: logic-app-standard
+        publishLocation: 'pipeline' 
+
+  ## Deploy the workflows
+  - job: deploy_app
+    displayName: Deploy application
+    dependsOn: build_app_package
+    steps:  
+    - task: DownloadPipelineArtifact@2
+      displayName: 'Download zip package'   
+      inputs:
+        buildType: 'current'
+        artifactName: logic-app-standard
+        targetPath: '$(Build.ArtifactStagingDirectory)'
+
+    - task: AzureFunctionApp@1
+      displayName: 'Deploy logic app workflows'
+      inputs:
+        azureSubscription: '${{ parameters.azureServiceConnection }}'
+        appType: 'functionApp'
+        appName: '$(Azure.Resource.LogicAppStandard.Service)'
+        package: '$(Build.ArtifactStagingDirectory)/logic-app-standard.zip'
+        deploymentMethod: 'zipDeploy' 

@@ -1,0 +1,8 @@
+variables:
+  Azure.Resource.Prefix: "max-$(Environment.ShortName)-$(Environment.Region.Primary.ShortName)"
+  
+  Azure.ResourceGroup.Prefix: 'maxim-$(Environment.Name)'
+
+  ResourceGroup.LogicAppStandard: '$(Azure.ResourceGroup.Prefix)-logic-app-standard'
+
+  Azure.Resource.LogicAppStandard.Service: '$(Azure.Resource.Prefix)-logicapps-service'

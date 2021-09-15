@@ -1,0 +1,6 @@
+variables:
+  Environment.Name: 'sandbox'
+  Environment.ShortName: 'snd'
+  
+  Environment.Region.Primary: "westeurope"
+  Environment.Region.Primary.ShortName: "we"
