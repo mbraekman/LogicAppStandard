@@ -18,7 +18,7 @@ stages:
     parameters:
       azureServiceConnection: 'Visual Studio Enterprise-abonnement – MPN'
       location: '$(Environment.Region.Primary)'
-      environment: 'DEV'
+      environment: 'Sandbox'
       environmentShortName: '$(Environment.ShortName)'
       resourceGroupName: '$(ResourceGroup.LogicAppStandard)'
       
