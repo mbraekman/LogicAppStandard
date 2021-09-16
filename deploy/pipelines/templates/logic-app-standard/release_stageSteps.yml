@@ -36,7 +36,7 @@ jobs:
                   az group create  `
                   --name ${{ parameters.resourceGroupName }}  `
                   --location ${{ parameters.location }}  `
-                  --tags environment=${{ parameters.environmentShortName }} createdBy=$(Release.ReleaseWebUrl) releaseName=$(Release.ReleaseName) triggeredBy=$(Release.Deployment.RequestedFor) triggerType=$(Release.Reason) 
+                  --tags environment=${{ parameters.environmentShortName }} createdBy=$(Release.ReleaseWebUrl) releaseName=$(Release.ReleaseName) triggeredBy=$(Release.Deployment.RequestedFor) triggerType=$(Release.Reason) sourceBranch=$(Release.SourceCodeBranch)
                   az deployment group create  `
                   --template-file $(Artifacts.Location.Deploy.Bicep)/deploy-infrastructure.bicep `
                   --parameters $(Artifacts.Location.Deploy.Bicep)/deploy-infrastructure.parameters.json `
