@@ -1,5 +1,5 @@
 variables:
-  Environment.Name: 'DEV'
+  Environment.Name: 'dev'
   Environment.ShortName: 'dev'
   
   Environment.Region.Primary: "westeurope"

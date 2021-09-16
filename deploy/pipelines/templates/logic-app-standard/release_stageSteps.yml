@@ -98,7 +98,7 @@ jobs:
               displayName: 'Publish zip package'
               inputs:
                 targetPath: '$(Build.ArtifactStagingDirectory)/logic-app-standard-${{ parameters.environmentShortName }}.zip'
-                artifact: logic-app-standard
+                artifact: logic-app-standard-${{ parameters.environmentShortName }}
                 publishLocation: 'pipeline' 
 
   ## Deploy the workflows
@@ -115,7 +115,7 @@ jobs:
               displayName: 'Download zip package'   
               inputs:
                 buildType: 'current'
-                artifactName: logic-app-standard
+                artifactName: logic-app-standard-${{ parameters.environmentShortName }}
                 targetPath: '$(Build.ArtifactStagingDirectory)'
 
             - task: AzureFunctionApp@1
