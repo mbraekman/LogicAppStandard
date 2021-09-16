@@ -2,6 +2,9 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "environment": {
+            "value": "#{Environment.ShortName}#"
+        },
         "location":{
             "value": "#{Environment.Region.Primary}#"
         },
@@ -10,6 +13,18 @@
         },
         "logicAppServiceName": {
             "value": "#{Azure.Resource.LogicAppStandard.Service}#"
+        },
+        "ReleaseName": {
+            "value": "#{Release.ReleaseName}#"
+        },
+        "ReleaseUrl": {
+            "value": "#{Release.ReleaseWebUrl}#"
+        },
+        "ReleaseRequestedFor": {
+            "value": "#{Release.Deployment.RequestedFor}#"
+        },
+        "ReleaseTriggerType": {
+            "value": "#{Release.Reason}#"
         }
     }
 }

@@ -5,14 +5,17 @@
   'northeurope'
 ])
 param location string
+param environment string
 param resourcePrefix string
 param logicAppServiceName string
+param releaseName string
+param releaseUrl string
+param releaseRequestedFor string
+param releaseTriggerType string
 
 // Define variables
 var trimmedResourcePrefix = replace(replace(resourcePrefix, '-', ''), '_', '')
 var appPlanName = '${resourcePrefix}-plan'
-//var logicAppAppServiceName = '${resourcePrefix}-logicapps-service'
-//var logicAppAppServiceName = logicApp_Service_Name
 var workflowName = 'orc-event-handler-stateless'
 var appInsightsName = '${resourcePrefix}-platform-insights'
 var storageAccountName = '${trimmedResourcePrefix}storage'
@@ -20,11 +23,20 @@ var keyVaultName = '${resourcePrefix}-key-vault'
 var serviceBusName = '${resourcePrefix}-service-bus'
 var logAnalyticsWorkspaceName = '${resourcePrefix}-monitoring'
 
+var tags = {
+  environment: environment
+  createdBy: releaseUrl
+  releaseName: releaseName
+  triggeredBy: releaseRequestedFor
+  triggerType: releaseTriggerType
+}
+
 // Define resources
 // Create Application Insights
 resource appInsights 'Microsoft.Insights/components@2020-02-02-preview' = {
-  location: location
   name: appInsightsName
+  location: location
+  tags: tags
   kind: 'web'
   properties: {
     Application_Type: 'web'
@@ -35,6 +47,7 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02-preview' = {
 resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
   name: logAnalyticsWorkspaceName
   location: location
+  tags: tags
   properties: {
     sku: {
       name: 'PerGB2018'
@@ -44,9 +57,10 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-06
 
 // Create Storage Account
 resource storageAccount 'Microsoft.Storage/storageAccounts@2021-02-01' = {
-  location: location
-  kind: 'StorageV2'
   name: storageAccountName
+  location: location
+  tags: tags
+  kind: 'StorageV2'
   sku: {
     name: 'Standard_LRS'
   }
@@ -73,8 +87,9 @@ resource container 'Microsoft.Storage/storageAccounts/blobServices/containers@20
 
 // Create KeyVault
 resource keyVault 'Microsoft.KeyVault/vaults@2019-09-01' = {
-  location: location
   name: keyVaultName
+  location: location
+  tags: tags
   properties: {
     tenantId: subscription().tenantId
     sku: {
@@ -91,6 +106,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2019-09-01' = {
 resource secret 'Microsoft.KeyVault/vaults/secrets@2019-09-01' = {
   parent: keyVault
   name: 'dummySecret'
+  tags: tags
   properties: {
     attributes: {
        enabled: true
@@ -102,8 +118,9 @@ resource secret 'Microsoft.KeyVault/vaults/secrets@2019-09-01' = {
 
 // Create ServiceBus
 resource serviceBus 'Microsoft.ServiceBus/namespaces@2021-01-01-preview' = {
-  location: location
   name: serviceBusName
+  location: location
+  tags: tags
   identity: {
      type: 'SystemAssigned'
   }
@@ -123,8 +140,9 @@ resource queue 'Microsoft.ServiceBus/namespaces/queues@2021-01-01-preview' = {
 
 // Create Service Plan
 resource myAppPlan 'Microsoft.Web/serverfarms@2020-12-01' = {
-  location: location
   name: appPlanName
+  location: location
+  tags: tags
   sku: {
     name: 'B1'
   }
@@ -137,8 +155,9 @@ resource myAppPlan 'Microsoft.Web/serverfarms@2020-12-01' = {
 
 // Create Logic App Standard
 resource appService 'Microsoft.Web/sites@2020-12-01' = {
-  location: location
   name: logicAppServiceName
+  location: location
+  tags: tags
   kind: 'workflowapp,functionapp'
   identity: {
     type: 'SystemAssigned'
@@ -226,6 +245,7 @@ resource accessToKeyVaultFromAppService 'Microsoft.KeyVault/vaults/accessPolicie
 resource logAnalyticsConnection 'Microsoft.Web/connections@2016-06-01' = {
   name: '${logicAppServiceName}-con-log-analytics'
   location: location
+  tags: tags
   kind: 'V2'
   properties: {
     api: {
