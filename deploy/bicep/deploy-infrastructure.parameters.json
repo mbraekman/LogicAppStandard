@@ -14,16 +14,16 @@
         "logicAppServiceName": {
             "value": "#{Azure.Resource.LogicAppStandard.Service}#"
         },
-        "ReleaseName": {
+        "releaseName": {
             "value": "#{Release.ReleaseName}#"
         },
-        "ReleaseUrl": {
+        "releaseUrl": {
             "value": "#{Release.ReleaseWebUrl}#"
         },
-        "ReleaseRequestedFor": {
+        "releaseRequestedFor": {
             "value": "#{Release.Deployment.RequestedFor}#"
         },
-        "ReleaseTriggerType": {
+        "releaseTriggerType": {
             "value": "#{Release.Reason}#"
         }
     }
