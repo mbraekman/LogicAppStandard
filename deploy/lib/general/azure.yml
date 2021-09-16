@@ -6,4 +6,3 @@ variables:
   ResourceGroup.LogicAppStandard: '$(Azure.ResourceGroup.Prefix)-logic-app-standard'
 
   Azure.Resource.LogicAppStandard.Service: '$(Azure.Resource.Prefix)-logicapps-service'
-  Azure.Resource.LogicAppStandard.Service.Con.LogAnalytics: '$(Azure.Resource.LogicAppStandard.Service)-con-log-analytics'

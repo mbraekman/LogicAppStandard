@@ -33,7 +33,10 @@ jobs:
                 scriptType: 'pscore'
                 scriptLocation: 'inlineScript'
                 inlineScript: |
-                  az group create --name ${{ parameters.resourceGroupName }} --location ${{ parameters.location }}
+                  az group create  `
+                  --name ${{ parameters.resourceGroupName }}  `
+                  --location ${{ parameters.location }}  `
+                  --tags environment=${{ parameters.environmentShortName }} createdBy=$(Release.ReleaseWebUrl) releaseName=$(Release.ReleaseName) triggeredBy=$(Release.Deployment.RequestedFor) triggerType=$(Release.Reason) 
                   az deployment group create  `
                   --template-file $(Artifacts.Location.Deploy.Bicep)/deploy-infrastructure.bicep `
                   --parameters $(Artifacts.Location.Deploy.Bicep)/deploy-infrastructure.parameters.json `
