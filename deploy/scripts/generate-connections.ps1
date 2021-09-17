@@ -49,17 +49,18 @@ Function Get-ConnectionsFile {
   #>
 
   Write-Host 'Copying Service Provider connections'
-  $serviceProviderConnections = (Get-ServiceProviderConnections) ?? @{}
+  $serviceProviderConnections = (Get-ServiceProviderConnections) #?? @{}
 
   Write-Host 'Looking up API Connectors'
-  $apiConnections = (Get-ApiConnections) ?? @{}
+  $apiConnections = (Get-ApiConnections) #?? @{}
 
   if ($withFunctions) {
     Write-Host 'Looking up Function Connectors'
-    $functionConnections = (Get-FunctionConnections) ?? @{}
+    $functionConnections = (Get-FunctionConnections) #?? @{}
   }
 
-  $json = $withFunctions ? @{"serviceProviderConnections" = $serviceProviderConnections;  "managedApiConnections" = $apiConnections; "functionConnections" = $functionConnections } : @{ "serviceProviderConnections" = $serviceProviderConnections; "managedApiConnections" = $apiConnections; }
+#  $json = $withFunctions ? @{"serviceProviderConnections" = $serviceProviderConnections;  "managedApiConnections" = $apiConnections; "functionConnections" = $functionConnections } : @{ "serviceProviderConnections" = $serviceProviderConnections; "managedApiConnections" = $apiConnections; }
+  $json = @{"serviceProviderConnections" = $serviceProviderConnections;  "managedApiConnections" = $apiConnections; "functionConnections" = $functionConnections }
   $json = ConvertTo-Json $json -Depth 5 -Compress
   $json = [Regex]::Replace($json, "\\u[a-zA-Z0-9]{4}", { param($u) [Regex]::Unescape($u) })
   $json | Set-Content -Path $outputLocation

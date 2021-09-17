@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.4.613.9944",
-      "templateHash": "12951503458922954713"
+      "templateHash": "16689045705419513903"
     }
   },
   "parameters": {
@@ -48,6 +48,7 @@
     "keyVaultName": "[format('{0}-key-vault', parameters('resourcePrefix'))]",
     "serviceBusName": "[format('{0}-service-bus', parameters('resourcePrefix'))]",
     "logAnalyticsWorkspaceName": "[format('{0}-monitoring', parameters('resourcePrefix'))]",
+    "logAnalyticsContributorRoleId": "[format('{0}/providers/Microsoft.Authorization/roleDefinitions/92aaf0da-9dab-42b6-94a3-d43ce8d16293', subscription().id)]",
     "tags": {
       "environment": "[parameters('environment')]",
       "createdBy": "[parameters('releaseUrl')]",
@@ -244,6 +245,10 @@
             {
               "name": "[format('Workflows.{0}.OperationOptions', variables('workflowName'))]",
               "value": "WithStatelessRunHistory"
+            },
+            {
+              "name": "LogAnalytics_CustomLogName",
+              "value": "LogicAppStandard"
             }
           ]
         }
@@ -294,6 +299,20 @@
         }
       },
       "dependsOn": [
+        "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2020-08-01-preview",
+      "scope": "[format('Microsoft.OperationalInsights/workspaces/{0}', variables('logAnalyticsWorkspaceName'))]",
+      "name": "[guid(resourceGroup().id)]",
+      "properties": {
+        "principalId": "[reference(resourceId('Microsoft.Web/sites', parameters('logicAppServiceName')), '2020-12-01', 'full').identity.principalId]",
+        "roleDefinitionId": "[variables('logAnalyticsContributorRoleId')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', parameters('logicAppServiceName'))]",
         "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]"
       ]
     }
