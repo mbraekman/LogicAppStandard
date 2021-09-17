@@ -1,0 +1,8 @@
+
+# Azure Functions artifacts
+/src/bin
+/src/obj
+/src/appsettings.json
+/src/local.settings.json
+/src/workflow-designtime/local.settings.json
+/deploy/**/*.local.json

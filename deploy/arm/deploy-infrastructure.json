@@ -1,0 +1,37 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "allowedValues": [
+                "westeurope",
+                "northeurope"
+            ]
+        },
+        "logicAppServiceName": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "logicApp.Connections.LogAnalytics.Name": "[concat(parameters('logicAppServiceName'), '-con-log-analytics')]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Web/connections/accessPolicies",
+            "apiVersion": "2016-06-01",
+            "name": "[concat(variables('logicApp.Connections.LogAnalytics.Name'),'/',guid(resourceGroup().id))]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "principal": {
+                    "type": "ActiveDirectory",
+                    "identity": {
+                        "objectId": "[reference(resourceId('Microsoft.Web/sites', parameters('logicAppServiceName')), '2020-12-01', 'full').identity.principalId]",
+                        "tenantId": "[subscription().tenantId]"
+                    }
+                }
+            }
+        }
+    ],
+    "outputs": {}
+}

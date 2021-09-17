@@ -23,7 +23,7 @@ var keyVaultName = '${resourcePrefix}-key-vault'
 var serviceBusName = '${resourcePrefix}-service-bus'
 var logAnalyticsWorkspaceName = '${resourcePrefix}-monitoring'
 
-var logAnalyticsContributorRoleId = '${subscription().id}/providers/Microsoft.Authorization/roleDefinitions/92aaf0da-9dab-42b6-94a3-d43ce8d16293'
+// var logAnalyticsContributorRoleId = '${subscription().id}/providers/Microsoft.Authorization/roleDefinitions/92aaf0da-9dab-42b6-94a3-d43ce8d16293'
 
 var tags = {
   environment: environment
@@ -264,12 +264,12 @@ resource logAnalyticsConnection 'Microsoft.Web/connections@2016-06-01' = {
   }
 }
 
-// Create Role Assignment on the Log Analytics workspace for the Logic App Service, to be used by the managed connectors.
-resource roleAssignment 'Microsoft.Authorization/roleAssignments@2020-08-01-preview' = {
-  name: guid(resourceGroup().id)
-  scope: logAnalyticsWorkspace
-  properties: {
-    principalId: appService.identity.principalId
-    roleDefinitionId: logAnalyticsContributorRoleId
-  }
-}
+//// Create Role Assignment on the Log Analytics workspace for the Logic App Service, to be used by the managed connectors - not required in this case.
+// resource roleAssignment 'Microsoft.Authorization/roleAssignments@2020-08-01-preview' = {
+//   name: guid(resourceGroup().id)
+//   scope: logAnalyticsWorkspace
+//   properties: {
+//     principalId: appService.identity.principalId
+//     roleDefinitionId: logAnalyticsContributorRoleId
+//   }
+// }

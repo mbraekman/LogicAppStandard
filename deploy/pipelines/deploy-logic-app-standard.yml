@@ -9,6 +9,7 @@ variables:
   Release.Deployment.RequestedFor: $(Build.RequestedFor)
   Release.Reason: $(Build.Reason)
   
+  Artifacts.Location.Deploy.Arm: $(System.DefaultWorkingDirectory)/deploy/arm
   Artifacts.Location.Deploy.Bicep: $(System.DefaultWorkingDirectory)/deploy/bicep
   Artifacts.Location.Deploy.Scripts: $(System.DefaultWorkingDirectory)/deploy/scripts
   Artifacts.Location.Source: $(System.DefaultWorkingDirectory)/src

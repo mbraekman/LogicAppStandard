@@ -1,3 +1,4 @@
+##Source: https://github.com/Azure/logicapps/blob/8bff92fd64f64128fa01e4f0244d420b38f34c4e/azure-devops-sample/.pipelines/scripts/Generate-Connections.ps1
 # Make sure you have connected your Azure account and set context to the subscription you want to use:
 # 1) Connect-AzAccount
 # 2) Set-AzContext -Subscription <subscription-id-here>
@@ -49,18 +50,17 @@ Function Get-ConnectionsFile {
   #>
 
   Write-Host 'Copying Service Provider connections'
-  $serviceProviderConnections = (Get-ServiceProviderConnections) #?? @{}
+  $serviceProviderConnections = (Get-ServiceProviderConnections) ?? @{}
 
   Write-Host 'Looking up API Connectors'
-  $apiConnections = (Get-ApiConnections) #?? @{}
+  $apiConnections = (Get-ApiConnections) ?? @{}
 
   if ($withFunctions) {
     Write-Host 'Looking up Function Connectors'
-    $functionConnections = (Get-FunctionConnections) #?? @{}
+    $functionConnections = (Get-FunctionConnections) ?? @{}
   }
 
-#  $json = $withFunctions ? @{"serviceProviderConnections" = $serviceProviderConnections;  "managedApiConnections" = $apiConnections; "functionConnections" = $functionConnections } : @{ "serviceProviderConnections" = $serviceProviderConnections; "managedApiConnections" = $apiConnections; }
-  $json = @{"serviceProviderConnections" = $serviceProviderConnections;  "managedApiConnections" = $apiConnections; "functionConnections" = $functionConnections }
+  $json = $withFunctions ? @{"serviceProviderConnections" = $serviceProviderConnections;  "managedApiConnections" = $apiConnections; "functionConnections" = $functionConnections } : @{ "serviceProviderConnections" = $serviceProviderConnections; "managedApiConnections" = $apiConnections; }
   $json = ConvertTo-Json $json -Depth 5 -Compress
   $json = [Regex]::Replace($json, "\\u[a-zA-Z0-9]{4}", { param($u) [Regex]::Unescape($u) })
   $json | Set-Content -Path $outputLocation

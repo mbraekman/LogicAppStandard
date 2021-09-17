@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.4.613.9944",
-      "templateHash": "16689045705419513903"
+      "templateHash": "1738506740200290439"
     }
   },
   "parameters": {
@@ -299,20 +299,6 @@
         }
       },
       "dependsOn": [
-        "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]"
-      ]
-    },
-    {
-      "type": "Microsoft.Authorization/roleAssignments",
-      "apiVersion": "2020-08-01-preview",
-      "scope": "[format('Microsoft.OperationalInsights/workspaces/{0}', variables('logAnalyticsWorkspaceName'))]",
-      "name": "[guid(resourceGroup().id)]",
-      "properties": {
-        "principalId": "[reference(resourceId('Microsoft.Web/sites', parameters('logicAppServiceName')), '2020-12-01', 'full').identity.principalId]",
-        "roleDefinitionId": "[variables('logAnalyticsContributorRoleId')]"
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Web/sites', parameters('logicAppServiceName'))]",
         "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]"
       ]
     }
