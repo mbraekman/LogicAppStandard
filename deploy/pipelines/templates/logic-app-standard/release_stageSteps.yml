@@ -87,13 +87,6 @@ jobs:
                 actionOnMissing: 'fail'
               enabled: true
 
-            - task: PublishPipelineArtifact@1
-              displayName: 'Publish zip package'
-              inputs:
-                targetPath: '$(Build.ArtifactStagingDirectory)/logic-app-standard-${{ parameters.environmentShortName }}.zip'
-                artifact: logic-app-standard-${{ parameters.environmentShortName }}
-                publishLocation: 'pipeline'
-
             - task: AzurePowerShell@4
               displayName: 'Generate connections.json file'
               inputs:
