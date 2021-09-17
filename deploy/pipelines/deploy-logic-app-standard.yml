@@ -14,6 +14,8 @@ variables:
   Artifacts.Location.Deploy.Scripts: $(System.DefaultWorkingDirectory)/deploy/scripts
   Artifacts.Location.Source: $(System.DefaultWorkingDirectory)/src
 
+  Stage.Attempt.Number: $(System.StageAttempt)
+
 stages:
 - stage: Sandbox
   displayName: Sandbox
@@ -23,6 +25,7 @@ stages:
   jobs: 
   - template: templates/logic-app-standard/release_stageSteps.yml
     parameters:
+      attemptNumber: '$(Stage.Attempt.Number)'
       azureServiceConnection: 'Visual Studio Enterprise-abonnement – MPN'
       location: '$(Environment.Region.Primary)'
       environment: 'Sandbox'
@@ -39,6 +42,7 @@ stages:
   jobs: 
   - template: templates/logic-app-standard/release_stageSteps.yml
     parameters:
+      attemptNumber: '$(Stage.Attempt.Number)'
       azureServiceConnection: 'Visual Studio Enterprise-abonnement – MPN'
       location: '$(Environment.Region.Primary)'
       environment: 'DEV'

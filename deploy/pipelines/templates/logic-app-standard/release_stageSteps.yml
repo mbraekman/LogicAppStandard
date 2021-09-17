@@ -1,4 +1,5 @@
 parameters:
+  attemptNumber: ''
   azureServiceConnection: ''
   location: ''
   environment: ''
@@ -123,7 +124,7 @@ jobs:
               displayName: 'Publish zip package'
               inputs:
                 targetPath: '$(Build.ArtifactStagingDirectory)/logic-app-standard-${{ parameters.environmentShortName }}.zip'
-                artifact: logic-app-standard-${{ parameters.environmentShortName }}
+                artifact: logic-app-standard-${{ parameters.environmentShortName }}-${{ parameters.attemptNumber }}
                 publishLocation: 'pipeline' 
 
   ## Deploy the workflows
@@ -140,7 +141,7 @@ jobs:
               displayName: 'Download zip package'   
               inputs:
                 buildType: 'current'
-                artifactName: logic-app-standard-${{ parameters.environmentShortName }}
+                artifactName: logic-app-standard-${{ parameters.environmentShortName }}-${{ parameters.attemptNumber }}
                 targetPath: '$(Build.ArtifactStagingDirectory)'
 
             - task: AzureFunctionApp@1
