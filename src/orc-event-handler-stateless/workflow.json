@@ -13,7 +13,7 @@
                   "method": "post",
                   "body": "@{triggerBody()}",
                   "headers": {
-                      "Log-Type": "Bicep_Sandbox"
+                    "Log-Type": "@appsetting('LogAnalytics_CustomLogName')"
                   },
                   "path": "/api/logs"
               },

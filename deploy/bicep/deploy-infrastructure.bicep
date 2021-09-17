@@ -216,6 +216,10 @@ resource appService 'Microsoft.Web/sites@2020-12-01' = {
           name: 'Workflows.${workflowName}.OperationOptions'
           value: 'WithStatelessRunHistory'
         }
+        {
+          name: 'LogAnalytics_CustomLogName'
+          value: 'LogicAppStandard'
+        }
       ]
     }
   }
